@@ -1,36 +1,48 @@
-const cheerio = require('cheerio');
-const axios = require('axios');
-const moment = require('moment');
-const fs = require('fs');
-const nodemailer = require('nodemailer');
+//*** This is a testing script ***
+
+const axios = require('axios')
+const moment = require('moment')
+const nodemailer = require('nodemailer')
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-const serviceLayerURL = 'URLDESERVICELAYER:PUERTO';
-const BANXICOToken = 'TOKENBANXICO';
+//URLs
+const serviceLayerURL = 'URLDESERVICELAYER:PUERTO'
+const BANXICOToken = 'BANXICOTOKEN'
+
+//SAT
+const SATCompanyDB = 'SBODemoMX'
+const SATUsername = 'manager'
+const SATPassword = 'PASSWORD'
+
+//Email
+const emailServiceProvider = 'gmail'
+const emailUsername = 'EMAIL@gmail.com'
+const emailPassword = 'PASSWORD'
+const emailSender = 'SENDER@gmail.com'
+const emailRecipient = 'RECIPIENT@gmail.com'
 
 init().then();
 
-
 async function init() {
-  const result = await updateSapRates();
-  if (result.success) {
-    const sentMailResult = sendMail(result);
+  const {successData} = await updateSapRates();
+  if (successData) {
+   sendMail(successData).then();
   }
 }
 
 async function sendMail(data) {
   let mailTransporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: emailServiceProvider,
     auth: {
-      user: 'CORREO@gmail.com',
-      pass: 'CONTRASEÑA'
+      user: emailUsername,
+      pass: emailPassword
     }
   });
 
   let mailDetails = {
-    from: 'CORREO@gmail.com',
-    to: 'CORREO@gmail.com',
+    from: emailSender,
+    to: emailRecipient,
     subject: `Actualización de divisas en SAP ${data.date}`,
     html: `<h3>Se actualizó correctamente USD y EUR</h3><p>USD: ${data.usd}, EUR: ${data.eur}</p>`
   };
@@ -66,9 +78,9 @@ async function updateSapRates() {
 
     //SAP
     const SAPLoginResponse = await axios.post(`https://${serviceLayerURL}/b1s/v1/Login`, {
-      "CompanyDB": "SBODemoMX",
-      "UserName": "manager",
-      "Password": "oscar0001",
+      "CompanyDB": SATCompanyDB,
+      "UserName": SATUsername,
+      "Password": SATPassword,
     });
     const cookie = SAPLoginResponse.headers['set-cookie'];
     //Set currency USD
