@@ -6,10 +6,12 @@ const nodemailer = require('nodemailer');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0"
 
-init().then();
-
 const serviceLayerURL = 'URLDESERVICELAYER:PUERTO';
 const BANXICOToken = 'TOKENBANXICO';
+
+init().then();
+
+
 
 async function init() {
   const result = await updateSapRates();
